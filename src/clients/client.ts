@@ -1,11 +1,11 @@
 import { Account, Chain, ReadOnlyFn } from "../clarity/mod.ts";
 
 export interface IClient {
-  readonly contractName: string
+  readonly contractName: string;
 }
 
 export abstract class Client {
-  abstract readonly contractName:string;
+  abstract readonly contractName: string;
   readonly chain: Chain;
   readonly deployer: Account;
 

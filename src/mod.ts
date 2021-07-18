@@ -11,5 +11,5 @@ export function it(name: string, fn: (ctx: Context) => void) {
   plan.it(name, fn);
 }
 
-export * from "./clarity/mod.ts"
-export * from "./clients/mod.ts"
+export * from "./clarity/mod.ts";
+export * from "./clients/mod.ts";

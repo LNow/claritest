@@ -15,6 +15,6 @@ describe("Counter", () => {
 
     console.info(block);
 
-    console.info(client.readCounter())
+    console.info(client.readCounter());
   });
 });
