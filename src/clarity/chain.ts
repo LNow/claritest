@@ -1,19 +1,19 @@
 import { Block, EmptyBlock } from "./blocks.ts";
+import { ClarinetProxy } from "./clarinet_proxy.ts";
 import { Tx } from "./transactions.ts";
 
 export class Chain {
   readonly sessionId: number;
+  private clarinet: ClarinetProxy;
   blockHeight: number = 1;
 
-  constructor(sessionId: number) {
+  constructor(sessionId: number, clarinet: ClarinetProxy) {
     this.sessionId = sessionId;
+    this.clarinet = clarinet;
   }
 
   mineBlock(transactions: Array<Tx>): Block {
-    let result = JSON.parse((Deno as any).core.opSync("mine_block", {
-      sessionId: this.sessionId,
-      transactions: transactions,
-    }));
+    let result = this.clarinet.mineBlock(this.sessionId, transactions);
     this.blockHeight = result.block_height;
     let block: Block = {
       height: result.block_height,
@@ -23,10 +23,7 @@ export class Chain {
   }
 
   mineEmptyBlock(count: number): EmptyBlock {
-    let result = JSON.parse((Deno as any).core.opSync("mine_empty_blocks", {
-      sessionId: this.sessionId,
-      count: count,
-    }));
+    let result = this.clarinet.mineEmptyBlocks(this.sessionId, count);
     this.blockHeight = result.block_height;
     let emptyBlock: EmptyBlock = {
       session_id: result.session_id,
@@ -41,13 +38,13 @@ export class Chain {
     args: Array<any>,
     sender: string,
   ): ReadOnlyFn {
-    let result = JSON.parse((Deno as any).core.opSync("call_read_only_fn", {
-      sessionId: this.sessionId,
-      contract: contract,
-      method: method,
-      args: args,
-      sender: sender,
-    }));
+    let result = this.clarinet.callReadOnlyFn(
+      this.sessionId,
+      contract,
+      method,
+      args,
+      sender,
+    );
     let readOnlyFn: ReadOnlyFn = {
       session_id: result.session_id,
       result: result.result,
@@ -57,9 +54,7 @@ export class Chain {
   }
 
   getAssetsMaps(): AssetsMaps {
-    let result = JSON.parse((Deno as any).core.opSync("get_assets_maps", {
-      sessionId: this.sessionId,
-    }));
+    let result = this.clarinet.getAssetsMap(this.sessionId);
     let assetsMaps: AssetsMaps = {
       session_id: result.session_id,
       assets: result.assets,

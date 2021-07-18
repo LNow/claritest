@@ -6,6 +6,7 @@ import { Contracts } from "./clarity/contracts.ts";
 import { ClientsFactory } from "./clients/clients_factory.ts";
 import { Tx } from "./clarity/transactions.ts";
 import { Context } from "./context.ts";
+import { ClarinetProxy } from "./clarity/clarinet_proxy.ts";
 
 export class TestCase {
   name: string;
@@ -43,25 +44,20 @@ export class TestCase {
       let contracts: Contracts;
       let deployer: Account;
       let clients: ClientsFactory;
+      let clarinet = ClarinetProxy.getInstance();
 
-      (Deno as any).core.ops();
       let transactions: Array<Tx> = [];
-      let result = JSON.parse(
-        (Deno as any).core.opSync("setup_chain", {
-          name: fullName,
-          transactions: transactions,
-        }),
-      );
+      let result = clarinet.setupChain(fullName, transactions);
 
-      chain = new Chain(result["session_id"]);
+      chain = new Chain(result.session_id, clarinet);
       accounts = new Map();
 
-      for (let account of result["accounts"]) {
+      for (let account of result.accounts) {
         accounts.set(account.name, account);
       }
 
       contracts = new Map();
-      for (let contract of result["contracts"]) {
+      for (let contract of result.contracts) {
         contracts.set(contract.contract_id, contract);
       }
 
